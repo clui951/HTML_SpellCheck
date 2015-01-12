@@ -1,5 +1,8 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+
+import java.util.Iterator;
 
 // Jsoup dependencies
 import org.jsoup.Jsoup;
@@ -16,7 +19,8 @@ public class WebPage {
 	private Document doc;
 	private Boolean valid;
 	private String html;
-	private String bodyText;
+	private String wordText;
+	private HashMap<String,Integer> wordMap;
 	
 	// Constructor takes in file name or path to file 
 	public WebPage( String fileName, int sourceType ) {
@@ -34,18 +38,28 @@ public class WebPage {
 				this.doc = Jsoup.connect("http://example.com/").get();
 			}
 			this.html = this.doc.html();
-			this.bodyText = this.doc.select("body").text();
+			this.wordText = this.doc.select("body").text();
 			this.valid = true;
 		} catch (IOException e) {
 			this.doc = null;
 			this.html = null;
-			this.bodyText = null;
+			this.wordText = null;
 			this.valid = false;
 			e.printStackTrace();
 		}
 		
 	}
-	
+
+	// Iterate through bodyText and hash words into hash map
+	public void collectWords() {
+		wordMap = new HashMap<String,Integer>();
+		for (String word : this.wordText.split(" ")) {
+			if (wordMap.containsKey(word)) {
+				wordMap.put(word,wordMap.get(word));
+			}
+				wordMap.put(word,1);
+	    }
+	}
 	
 	
 	
@@ -56,7 +70,7 @@ public class WebPage {
 	}
 	
 	public String getHTML() {
-		return this.doc.html();
+		return this.html;
 	}
 	
 	public Boolean isValid() {
@@ -64,7 +78,9 @@ public class WebPage {
 	}
 	
 	public String getBodyText() {
-		return this.bodyText;
+		return this.wordText;
 	}
+	
+
 	
 }
