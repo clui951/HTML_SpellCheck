@@ -52,12 +52,13 @@ public class WebPage {
 
 	// Iterate through bodyText and hash words into hash map
 	public void collectWords() {
-		wordMap = new HashMap<String,Integer>();
-		for (String word : this.wordText.split(" ")) {
+		this.wordMap = new HashMap<String,Integer>();
+		for ( String word : this.wordText.replaceAll("[^a-zA-z']"," ").split(" ") ) {
 			if (wordMap.containsKey(word)) {
-				wordMap.put(word,wordMap.get(word));
+				wordMap.put(word, wordMap.get(word) + 1);
+			} else {
+				wordMap.put(word, 1);
 			}
-				wordMap.put(word,1);
 	    }
 	}
 	
@@ -81,6 +82,12 @@ public class WebPage {
 		return this.wordText;
 	}
 	
-
+	public void printWordMap() {
+		Iterator<String> keySetIterator = this.wordMap.keySet().iterator();
+		while (keySetIterator.hasNext()) {
+			String tempKey = keySetIterator.next();
+			System.out.println(tempKey + " : " + wordMap.get(tempKey));
+		}
+	}
 	
 }

@@ -12,7 +12,9 @@ public class HTML_SpellCheck {
 		System.out.println("Running\n");
 		WebPage page = new WebPage("../sample.html", WebPage.LOCAL);
 //		System.out.println(page.getHTML());
-		System.out.println(page.getBodyText());
+		System.out.println(page.getBodyText() + "\n\n");
+		page.collectWords();
+		page.printWordMap();
 	}
 
 	
