@@ -10,5 +10,5 @@ Bulk Spell Checking and Replacement for a Website
 
 ####How to compile and execute from command line: 
 From the src file, enter commands
-* javac -cp '.:../jsoup-1.8.1.jar' HTML_SpellCheck.java
-* java -cp '.:../jsoup-1.8.1.jar' HTML_SpellCheck
+* javac -cp '.:../*' HTML_SpellCheck.java
+* java -cp '.:../*' HTML_SpellCheck

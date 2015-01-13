@@ -35,7 +35,7 @@ public class WebPage {
 			if (sourceType == LOCAL) {
 				this.doc = Jsoup.parse(new File(this.fileName), "UTF-8");
 			} else {
-				this.doc = Jsoup.connect("http://example.com/").get();
+				this.doc = Jsoup.connect(this.fileName).get();
 			}
 			this.html = this.doc.html();
 			this.wordText = this.doc.select("body").text();
