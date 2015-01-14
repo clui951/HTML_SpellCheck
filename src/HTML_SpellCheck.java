@@ -20,13 +20,16 @@ public class HTML_SpellCheck {
 		Scanner in = new Scanner(System.in);
 		System.out.print("\nSpellCheck HTML (F)ile or (W)ebsite: ");
 		String sourceType = in.nextLine();
-		int sourceIndic;
+		int sourceIndic = -1;
 		if (sourceType.equals("F")) {
 			sourceIndic = WebPage.LOCAL;
 			System.out.print("Enter file to spellcheck: \n > ");
-		} else {
+		} else if (sourceType.equals("W")) {
 			sourceIndic = WebPage.WEB;
-			System.out.print("Enter website to spellcheck: \n >");
+			System.out.print("Enter website to spellcheck (include http header as applicable): \n > ");
+		} else {
+			System.out.println("Incorrect Option. Choose F or W. \n");
+			System.exit(0);;
 		}
 		String sourcePath = in.nextLine();
 		WebPage page = new WebPage(sourcePath, sourceIndic);
@@ -41,6 +44,9 @@ public class HTML_SpellCheck {
 			System.out.print("Specify file name or path: \n > ");
 			String writeDest = in.nextLine();
 			page.writeNewHTML(writeDest);
+			System.out.println("\nWrite Completed at: " + writeDest);
+		} else {
+			System.out.println("\nNo Write Peformed.");
 		}
 		System.out.println();
 		
