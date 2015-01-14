@@ -12,6 +12,7 @@ Bulk Spell Checking and Replacement for a Website
 Download executable jar file located in dist/ folder.
 
 <p>
+<p>
 
 ####How to compile and execute from command line: 
 From the src file, enter commands
