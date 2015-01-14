@@ -22,14 +22,15 @@ public class WebPage {
 	private String wordText;
 	private HashMap<String,Integer> wordMap;
 	
-	// Constructor takes in file name or path to file 
+	// Constructor takes in file name or website url along with indicator for which one
+	// automatically calls readDoc to parse
 	public WebPage( String fileName, int sourceType ) {
 		this.fileName = fileName;
 		this.sourceType = sourceType;
 		this.readDoc();
 	}
 	
-	// Parse to given file
+	// Parse given file and extract information
 	public void readDoc() {
 		try {
 			if (sourceType == LOCAL) {
@@ -51,7 +52,9 @@ public class WebPage {
 	}
 
 	// Iterate through bodyText and hash words into hash map
-	public void collectWords() {
+	// hash map keeps track of how many instances of each word there is
+	// * Not used in actual program but useful for testing
+	public void collectWordCount() {
 		this.wordMap = new HashMap<String,Integer>();
 		for ( String word : this.wordText.replaceAll("[^a-zA-z']"," ").split(" ") ) {
 			if (wordMap.containsKey(word)) {
