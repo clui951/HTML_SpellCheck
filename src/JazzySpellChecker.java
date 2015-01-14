@@ -74,7 +74,7 @@ public class JazzySpellChecker {
 	
 	private void generateBestGuessHTML() {
 		for (int i = 0; i < this.suggestedWords.size(); i++) {
-			this.suggHTML.replaceFirst(this.misspelledWords.get(i), this.suggestedWords.get(i));
+			this.suggHTML = this.suggHTML.replaceFirst(this.misspelledWords.get(i), this.suggestedWords.get(i));
 		}
 	}
 	
