@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.swabunga.spell.engine.SpellDictionaryHashMap;
 import com.swabunga.spell.engine.Word;
@@ -11,11 +12,14 @@ import com.swabunga.spell.event.SpellChecker;
 import com.swabunga.spell.event.StringWordTokenizer;
 import com.swabunga.spell.event.TeXWordFinder;
 
-public class JazzySpellChecker implements SpellCheckListener {
+public class JazzySpellChecker {
 
-	private String inputText;
+	private String origText;
 	private SpellChecker spellChecker;
 	private ArrayList<String> misspelledWords;
+	private ArrayList<String> suggestedWords;
+	private String origHTML;
+	private String suggHTML;
 	
 
 	// set up the dictionary once for all future uses
@@ -32,22 +36,48 @@ public class JazzySpellChecker implements SpellCheckListener {
 	}
 	
 	// Constructor takes in string to spell check
-	public JazzySpellChecker(String input) {
-		this.inputText = input;
+	public JazzySpellChecker(String inputText, String inputHTML) {
+		this.origText = inputText;
+		this.origHTML = inputHTML;
+		this.suggHTML = inputHTML;
 		spellChecker = new SpellChecker(dictionaryHashMap);
-		misspelledWords = new ArrayList<String>();
 		this.collectMisspelledWords();
+		this.collectSuggestedWords();
+		this.generateBestGuessHTML();
 	}
 	
 	// Called by Constructor to store all misspelled words into our ArrayList misspelledWords
 	private void collectMisspelledWords() {
-		for (String word : this.inputText.replaceAll("[^a-zA-z']", " ").split(" ")) {
+		this.misspelledWords = new ArrayList<String>();
+		for (String word : this.origText.replaceAll("[^a-zA-z']", " ").split(" ")) {
 			StringWordTokenizer wordTok = new StringWordTokenizer(word, new TeXWordFinder());
 			if (spellChecker.checkSpelling(wordTok) == 1) {
 				misspelledWords.add(word);
 			}
 		}  
 	 }
+	
+	// Called by Constructor to generate ArrayList of a best guess for each misspelled word
+	private void collectSuggestedWords() {
+		this.suggestedWords = new ArrayList<String>();
+		for (String wrongWord : this.misspelledWords) {
+			List<Word> singleWordSuggestions = spellChecker.getSuggestions(wrongWord, 0);
+			if (singleWordSuggestions.size() != 0) {
+				String suggestedWord = singleWordSuggestions.get(0).getWord();
+				this.suggestedWords.add( suggestedWord );
+			} else {
+				// no replacement word found
+				this.suggestedWords.add(wrongWord);
+			}
+		}
+	}
+	
+	private void generateBestGuessHTML() {
+		for (int i = 0; i < this.suggestedWords.size(); i++) {
+			this.suggHTML.replaceFirst(this.misspelledWords.get(i), this.suggestedWords.get(i));
+		}
+	}
+	
 	
 	
 	
@@ -57,18 +87,15 @@ public class JazzySpellChecker implements SpellCheckListener {
 		return this.misspelledWords;
 	}
 	
-	
-	
-	public void runTest() {
-		StringWordTokenizer texTok = new StringWordTokenizer("hoey");
-		// returns -1 if word exists; 1 otherwise
-		System.out.println(spellChecker.checkSpelling(texTok));
+	public ArrayList<String> getSuggestedWords() {
+		return this.suggestedWords;
 	}
+	
+	public String getSuggestedHTML() {
+		return this.suggHTML;
+	}
+	
 
-	@Override
-	public void spellingError(SpellCheckEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+
 	
 }

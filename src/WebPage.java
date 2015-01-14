@@ -19,6 +19,7 @@ public class WebPage {
 	private Document doc;
 	private Boolean valid;
 	private String html;
+	private String correctedHtml;
 	private String wordText;
 	private HashMap<String,Integer> wordMap;
 	
