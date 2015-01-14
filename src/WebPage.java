@@ -1,8 +1,17 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
-
 import java.util.Iterator;
+
+
+
+
+
+
 
 // Jsoup dependencies
 import org.jsoup.Jsoup;
@@ -18,10 +27,12 @@ public class WebPage {
 	private String fileName;
 	private Document doc;
 	private Boolean valid;
-	private String html;
-	private String correctedHtml;
+	private String origHTML;
+	private String correctedHTML;
 	private String wordText;
 	private HashMap<String,Integer> wordMap;
+	private ArrayList<String> misspelledWords;
+	private ArrayList<String> suggestedWords;
 	
 	// Constructor takes in file name or website url along with indicator for which one
 	// automatically calls readDoc to parse
@@ -29,22 +40,24 @@ public class WebPage {
 		this.fileName = fileName;
 		this.sourceType = sourceType;
 		this.readDoc();
+		this.generateCorrectHTML();
+		this.collectWordCount();
 	}
 	
 	// Parse given file and extract information
-	public void readDoc() {
+	private void readDoc() {
 		try {
 			if (sourceType == LOCAL) {
 				this.doc = Jsoup.parse(new File(this.fileName), "UTF-8");
 			} else {
 				this.doc = Jsoup.connect(this.fileName).get();
 			}
-			this.html = this.doc.html();
+			this.origHTML = this.doc.html();
 			this.wordText = this.doc.select("body").text();
 			this.valid = true;
 		} catch (IOException e) {
 			this.doc = null;
-			this.html = null;
+			this.origHTML = null;
 			this.wordText = null;
 			this.valid = false;
 			e.printStackTrace();
@@ -55,7 +68,7 @@ public class WebPage {
 	// Iterate through bodyText and hash words into hash map
 	// hash map keeps track of how many instances of each word there is
 	// * Not used in actual program but useful for testing
-	public void collectWordCount() {
+	private void collectWordCount() {
 		this.wordMap = new HashMap<String,Integer>();
 		for ( String word : this.wordText.replaceAll("[^a-zA-z']"," ").split(" ") ) {
 			if (wordMap.containsKey(word)) {
@@ -66,6 +79,27 @@ public class WebPage {
 	    }
 	}
 	
+	private void generateCorrectHTML() {
+		JazzySpellChecker spellCheck = new JazzySpellChecker(this.wordText, this.origHTML);
+		this.correctedHTML = spellCheck.getSuggestedHTML();
+		this.misspelledWords = spellCheck.getMisspelledWords();
+		this.suggestedWords = spellCheck.getSuggestedWords();
+	}
+	
+	
+	// write best suggested HTML to new file
+	public void writeNewHTML(String newName) {
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(newName, "UTF-8");
+			writer.println(this.correctedHTML);
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 	/* Getters & Setters */
@@ -75,7 +109,7 @@ public class WebPage {
 	}
 	
 	public String getHTML() {
-		return this.html;
+		return this.origHTML;
 	}
 	
 	public Boolean isValid() {
@@ -84,6 +118,18 @@ public class WebPage {
 	
 	public String getBodyText() {
 		return this.wordText;
+	}
+	
+	public String getCorrectHTML() {
+		return this.correctedHTML;
+	}
+	
+	public ArrayList<String> getMisspelledWords() {
+		return this.misspelledWords;
+	}
+	
+	public ArrayList<String> getSuggestedWords() {
+		return this.suggestedWords;
 	}
 	
 	public void printWordMap() {
